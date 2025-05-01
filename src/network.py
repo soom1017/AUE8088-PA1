@@ -22,7 +22,18 @@ class MyNetwork(AlexNet):
     def __init__(self):
         super().__init__()
 
-        # [TODO] Modify feature extractor part in AlexNet
+        self.features = nn.Sequential(
+            nn.Conv2d(3, 64, kernel_size=5, stride=2, padding=2),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(kernel_size=3, stride=2),
+            nn.Conv2d(64, 192, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(kernel_size=3, stride=2),
+            nn.Conv2d(192, 384, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(384, 256, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+        )
 
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
