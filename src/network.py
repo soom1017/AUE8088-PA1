@@ -17,14 +17,34 @@ import src.config as cfg
 from src.util import show_setting
 
 
-# [TODO: Optional] Rewrite this class if you want
 class MyNetwork(AlexNet):
-    def __init__(self, num_classes: int = 200):
-        super().__init__(num_classes=num_classes)
-
+    def __init__(self, num_classes: int = 200, dropout: float = 0.5):
+        super().__init__(num_classes=num_classes, dropout=dropout)
+        
+        self.features = nn.Sequential(
+            nn.Conv2d(3, 64, kernel_size=5, stride=2, padding=2),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(kernel_size=3, stride=2),
+            nn.Conv2d(64, 192, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(kernel_size=3, stride=2),
+            nn.Conv2d(192, 384, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(384, 256, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+        )
+        
+        self.classifier = nn.Sequential(
+            nn.Dropout(p=dropout),
+            nn.Linear(256 * 6 * 6, 4096),
+            nn.ReLU(inplace=True),
+            nn.Dropout(p=dropout),
+            nn.Linear(4096, 1024),
+            nn.ReLU(inplace=True),
+            nn.Linear(1024, num_classes),
+        )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        # [TODO: Optional] Modify this as well if you want
         x = self.features(x)
         x = self.avgpool(x)
         x = torch.flatten(x, 1)
