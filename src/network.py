@@ -12,7 +12,7 @@ from torchvision.models.alexnet import AlexNet
 import torch
 
 # Custom packages
-from src.metric import MyAccuracy
+from src.metric import MyAccuracy, MyF1Score
 import src.config as cfg
 from src.util import show_setting
 
@@ -55,7 +55,7 @@ class SimpleClassifier(LightningModule):
         self.loss_fn = nn.CrossEntropyLoss()
 
         # Metric
-        self.accuracy = MyAccuracy()
+        self.accuracy = MyF1Score(num_classes)
 
         # Hyperparameters
         self.save_hyperparameters()
