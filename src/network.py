@@ -17,7 +17,20 @@ from src.metric import MyAccuracy, MyF1Score
 import src.config as cfg
 from src.util import show_setting
 
+class ResidualBlock(nn.Module):
+    def __init__(self, channels):
+        super().__init__()
+        self.block = nn.Sequential(
+            nn.Conv2d(channels, channels, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(channels, channels, kernel_size=3, padding=1)
+        )
+        self.relu = nn.ReLU(inplace=True)
 
+    def forward(self, x):
+        out = self.block(x)
+        return self.relu(out + x)
+    
 class MyNetwork(AlexNet):
     def __init__(self, num_classes: int = 200, dropout: float = 0.5):
         super().__init__(num_classes=num_classes, dropout=dropout)
@@ -26,9 +39,15 @@ class MyNetwork(AlexNet):
             nn.Conv2d(3, 64, kernel_size=5, stride=2, padding=2),
             nn.ReLU(inplace=True),
             nn.MaxPool2d(kernel_size=3, stride=2),
+            
+            ResidualBlock(64),
+            
             nn.Conv2d(64, 192, kernel_size=3, padding=1),
             nn.ReLU(inplace=True),
             nn.MaxPool2d(kernel_size=3, stride=2),
+            
+            ResidualBlock(192),
+            
             nn.Conv2d(192, 384, kernel_size=3, padding=1),
             nn.ReLU(inplace=True),
             nn.Conv2d(384, 256, kernel_size=3, padding=1),
@@ -71,7 +90,7 @@ class SimpleClassifier(LightningModule):
             self.model = models.get_model(model_name, num_classes=num_classes)
 
         # Loss function
-        self.loss_fn = LabelSmoothingCrossEntropy(smoothing=0.1)
+        self.loss_fn = nn.CrossEntropyLoss()
 
         # Metric
         self.accuracy = MyAccuracy()
