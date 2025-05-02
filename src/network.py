@@ -12,6 +12,7 @@ from torchvision.models.alexnet import AlexNet
 import torch
 
 # Custom packages
+from src.loss import LabelSmoothingCrossEntropy
 from src.metric import MyAccuracy, MyF1Score
 import src.config as cfg
 from src.util import show_setting
@@ -70,7 +71,7 @@ class SimpleClassifier(LightningModule):
             self.model = models.get_model(model_name, num_classes=num_classes)
 
         # Loss function
-        self.loss_fn = nn.CrossEntropyLoss()
+        self.loss_fn = LabelSmoothingCrossEntropy(smoothing=0.1)
 
         # Metric
         self.accuracy = MyAccuracy()
